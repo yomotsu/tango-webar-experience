@@ -1,0 +1,30 @@
+{
+  "name": "demo",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev": "concurrently \"npm run devserver\" \"npm run copystatic\"",
+    "copystatic": "cpx \"./static/**\" ./dist",
+    "devserver": "cross-env NODE_ENV=development webpack-dev-server --config build/webpack.config.js --open --hot",
+    "build": "cross-env NODE_ENV=production webpack --config build/webpack.config.js --progress --hide-modules"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "es6-tween": "^3.8.24",
+    "three": "^0.87.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-latest": "^6.24.1",
+    "concurrent": "^0.3.2",
+    "concurrently": "^3.5.0",
+    "cpx": "^1.5.0",
+    "cross-env": "^5.0.5",
+    "exports-loader": "^0.6.4",
+    "imports-loader": "^0.7.1",
+    "webpack": "^3.7.1",
+    "webpack-dev-server": "^2.9.2"
+  }
+}
