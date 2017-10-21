@@ -4,7 +4,6 @@ import { getARDisplay } from './ar-utils.js';
 import ARView from './ARView.js';
 import ARPerspectiveCamera from './ARPerspectiveCamera.js';
 import ARPointCloudGeometry from './ARPointCloudGeometry.js';
-import ARPointCloudDepthMaterial from './ARPointCloudDepthMaterial.js';
 import positionAndRotateObject3DWithPickingPointAndPlaneInPointCloud from './positionAndRotateObject3DWithPickingPointAndPlaneInPointCloud.js';
 import loadModels from './load-models.js';
 
@@ -14,11 +13,19 @@ autoPlay( true );
 
 const se = new Audio( 'se.ogg' );
 
+const state = {
+	showPassThroughCamera: true,
+	showPointCloud: false,
+	showVrObjects: true,
+};
+
 getARDisplay().then( ( vrDisplay ) => {
 
 	Promise.all( [
 		loadModels()
 	] ).then( results => {
+
+		alert( 'AR ready' );
 
 		const models = results[ 0 ];
 
@@ -46,19 +53,16 @@ getARDisplay().then( ( vrDisplay ) => {
 			new THREE.AmbientLight( 0x999999 )
 		);
 
-		// var model = new THREE.Mesh(
-		// 	new THREE.BoxGeometry( .1, .1, .1 ),
-		//   new THREE.MeshBasicMaterial( {color: 0xff00ff } )
-		// );
-		// model.position.set( 0, 0, - 0.1 );
-		// scene.add( model );
-
-		// scene.add( models[ 0 ] );
-
-
-		const pointCloudDepthMaterial = new ARPointCloudDepthMaterial();
+		const pointCloudDepthMaterial = new THREE.PointsMaterial( {
+			size: .03,
+			color: new THREE.Color( 0xffffff )
+		} );
 		const pointCloudGeometry = new ARPointCloudGeometry( vrDisplay );
-		const points = new THREE.Points( pointCloudGeometry, pointCloudDepthMaterial );
+
+		const points = new THREE.Points(
+			pointCloudGeometry,
+			pointCloudDepthMaterial
+		);
 		points.frustumCulled = false;
 		pointsDepthScene.add( points );
 
@@ -91,13 +95,33 @@ getARDisplay().then( ( vrDisplay ) => {
 			pointCloudGeometry.update( true, 0, true );
 
 			renderer.clear();
-			arView.render();
 
-			renderer.context.colorMask( false, false, false, false );
-			renderer.render( pointsDepthScene, camera );
-			renderer.context.colorMask( true, true, true, true );
+			// render AR View
+			if ( state.showPassThroughCamera ) {
 
-			renderer.render( scene, camera );
+				arView.render();
+
+			}
+
+			// render depth pointCloud
+			if ( state.showPointCloud ) {
+
+				renderer.render( pointsDepthScene, camera );
+
+			} else {
+
+				renderer.context.colorMask( false, false, false, false );
+				renderer.render( pointsDepthScene, camera );
+				renderer.context.colorMask( true, true, true, true );
+
+			}
+
+			// render scene
+			if ( state.showVrObjects ) {
+
+				renderer.render( scene, camera );
+
+			}
 
 		}
 
@@ -114,10 +138,11 @@ getARDisplay().then( ( vrDisplay ) => {
 
 			}
 
+			// hit test (aka anchor)
 			positionAndRotateObject3DWithPickingPointAndPlaneInPointCloud(
 				pointAndPlane,
 				model,
-				- 0.01
+				- 0.01 // 1センチ地面に埋める
 			);
 
 			model.scale.set( 0, 0, 0 );
@@ -135,5 +160,24 @@ getARDisplay().then( ( vrDisplay ) => {
 		}
 
 	} );
+
+} );
+
+
+document.getElementById( 'show-pass-through-camera' ).addEventListener( 'change', function() {
+
+	state.showPassThroughCamera = this.checked;
+
+} );
+
+document.getElementById( 'show-point-cloud' ).addEventListener( 'change', function() {
+
+	state.showPointCloud = this.checked;
+
+} );
+
+document.getElementById( 'show-vr-objects' ).addEventListener( 'change', function() {
+
+	state.showVrObjects = this.checked;
 
 } );

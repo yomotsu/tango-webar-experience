@@ -7,11 +7,33 @@
 <style>
 body{margin: 0;}
 canvas{display: block;}
+.ctrl{
+	color: #FFF;
+	position: absolute;
+	top: 0;
+	left: 0;
+	padding: 5px;
+	background: rgba( 0, 0, 0, .5 );
+}
 </style>
 </head>
 <body>
 
-<script src="dist/bundle.js"></script>
+<div class="ctrl">
+	<label>
+		<input type="checkbox" checked id="show-pass-through-camera">show pass-through-camera
+	</label>
+	<br>
+	<label>
+		<input type="checkbox" id="show-point-cloud">show point-cloud
+	</label>
+	<br>
+	<label>
+		<input type="checkbox" checked id="show-vr-objects">show vr-objects
+	</label>
+</div>
+
+<script src="bundle.js"></script>
 
 </body>
 </html>
